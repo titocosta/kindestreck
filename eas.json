@@ -1,0 +1,39 @@
+{
+  "cli": {
+    "version": ">= 12.6.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_KINDE_ISSUER_URL": "https://streckenheld.kinde.com",
+        "EXPO_PUBLIC_KINDE_POST_CALLBACK_URL": "streckenheld://localhost:3000/kinde_callback",
+        "EXPO_PUBLIC_KINDE_POST_LOGOUT_REDIRECT_URL": "streckenheld://localhost:3000/kinde_callback",
+        "EXPO_PUBLIC_KINDE_CLIENT_ID": "facb87bcd98245188de59ab734e3679c"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_KINDE_ISSUER_URL": "https://streckenheld.kinde.com",
+        "EXPO_PUBLIC_KINDE_POST_CALLBACK_URL": "streckenheld://localhost:3000/kinde_callback",
+        "EXPO_PUBLIC_KINDE_POST_LOGOUT_REDIRECT_URL": "streckenheld://localhost:3000/kinde_callback",
+        "EXPO_PUBLIC_KINDE_CLIENT_ID": "facb87bcd98245188de59ab734e3679c"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_KINDE_ISSUER_URL": "https://streckenheld.kinde.com",
+        "EXPO_PUBLIC_KINDE_POST_CALLBACK_URL": "streckenheld://partner.streckenheld.com/kinde_callback",
+        "EXPO_PUBLIC_KINDE_POST_LOGOUT_REDIRECT_URL": "streckenheld://partner.streckenheld.com/kinde_callback",
+        "EXPO_PUBLIC_KINDE_CLIENT_ID": "facb87bcd98245188de59ab734e3679c"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
