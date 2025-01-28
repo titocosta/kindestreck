@@ -140,7 +140,7 @@ export default function AppProvider( { children }: { children: React.ReactNode }
     throw new Error('Missing EXPO_PUBLIC_KINDE_ISSUER_URL');
   }
   const discovery = useAutoDiscovery(process.env.EXPO_PUBLIC_KINDE_ISSUER_URL);
-  console.debug(`[AppContext] AppProvider: discovery`, discovery, redirectUri);
+  // console.debug(`[AppContext] AppProvider: discovery`, discovery, redirectUri);
 
   React.useEffect(() => {
     checkAuthentication();
