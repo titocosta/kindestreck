@@ -1,4 +1,6 @@
-import { Ionicons } from '@expo/vector-icons';
+// import { Ionicons } from '@expo/vector-icons';
+import Feather from '@expo/vector-icons/Feather';
+
 
 
 export type Data = {
@@ -12,20 +14,20 @@ export type Data = {
 export const data: Data[] = [
   {
     id: 1,
-    icon: <Ionicons name="cloud-upload-outline" size={180} color="black" />,
-    title: 'Upload your PDFs and documents',
-    text: 'Our AI will help you extract key information on the go.',
+    icon: <Feather name="upload" size={180} color="black" />,
+    title: 'All your orders in one place',
+    text: 'Place your orders to all of your retailers and suppliers from our app',
   },
   {
     id: 2,
-    icon: <Ionicons name="camera-outline" size={180} color="black" />,
-    title: 'Take screenshots',
-    text: 'Use OpenIndex.ai to organize and extract text from your screenshots.',
+    icon: <Feather name="dollar-sign" size={180} color="black" />,
+    title: 'Get payment terms',
+    text: 'Grow your business with 30-, 60-, 90-day terms',
   },
   {
     id: 3,
-    icon: <Ionicons name="chatbox-outline" size={180} color="black" />,
-    title: 'Chat with your documents',
-    text: 'Use our chatbot to search and find your documents.',
+    icon: <Feather name="truck" size={180} color="black" />,
+    title: 'Track your orders',
+    text: 'Save time and money, plan your work accordingly',
   },
 ];
