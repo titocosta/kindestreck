@@ -10,14 +10,30 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.streckenheld.app"
+      "bundleIdentifier": "com.streckenheld.app",
+      "scheme": "streckenheld",
+      "associatedDomains": [
+        "applinks:streckenheld.kinde.com"
+      ]
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.streckenheld.app"
+      "package": "com.streckenheld.app",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "category": ["DEFAULT", "BROWSABLE"],
+          "data": [
+            {
+              "scheme": "streckenheld",
+              "host": "streckenheld.kinde.com"
+            }
+          ]
+        }
+      ]
     },
     "web": {
       "bundler": "metro",
