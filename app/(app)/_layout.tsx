@@ -18,6 +18,7 @@ export default function AppLayout() {
           headerShown: false,
         }}
       />
+      {/*
       <Stack.Screen
         name="delete"
         options={{
@@ -25,6 +26,7 @@ export default function AppLayout() {
           headerShown: false,
         }}
       />
+      */}
     </Stack>
   );
 }

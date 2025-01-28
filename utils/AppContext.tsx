@@ -3,23 +3,10 @@ import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import Snackbar from 'react-native-snackbar';
-import { KindeSDK } from '@kinde-oss/react-native-sdk-0-7x';
+import { useKindeAuth } from "@kinde/expo";
+import Constants from "expo-constants";
+import { makeRedirectUri, useAutoDiscovery } from "expo-auth-session";
 // import appsFlyer from 'react-native-appsflyer';
-
-if(!process.env.EXPO_PUBLIC_KINDE_ISSUER_URL) {
-  throw new Error('Missing Kinde issuer URL');
-}
-if(!process.env.EXPO_PUBLIC_KINDE_POST_CALLBACK_URL) {
-  throw new Error('Missing Kinde post callback URL');
-}
-if(!process.env.EXPO_PUBLIC_KINDE_CLIENT_ID) {
-  throw new Error('Missing Kinde client ID');
-}
-if(!process.env.EXPO_PUBLIC_KINDE_POST_LOGOUT_REDIRECT_URL) {
-  throw new Error('Missing Kinde post logout redirect URL');
-}
-
-const client = new KindeSDK(process.env.EXPO_PUBLIC_KINDE_ISSUER_URL, process.env.EXPO_PUBLIC_KINDE_POST_CALLBACK_URL, process.env.EXPO_PUBLIC_KINDE_CLIENT_ID, process.env.EXPO_PUBLIC_KINDE_POST_LOGOUT_REDIRECT_URL);
 
 /*
 if(!process.env.EXPO_PUBLIC_APPSFLYER_DEV_KEY) {
@@ -146,6 +133,14 @@ export const AppContext = React.createContext(initialState);
 
 export default function AppProvider( { children }: { children: React.ReactNode }) {
   const [state, dispatch] = React.useReducer(reducer, initialState);
+  const client = useKindeAuth();
+
+  const redirectUri = makeRedirectUri({ native: Constants.isDevice });
+  if(!process.env.EXPO_PUBLIC_KINDE_ISSUER_URL) {
+    throw new Error('Missing EXPO_PUBLIC_KINDE_ISSUER_URL');
+  }
+  const discovery = useAutoDiscovery(process.env.EXPO_PUBLIC_KINDE_ISSUER_URL);
+  console.debug(`[AppContext] AppProvider: discovery`, discovery, redirectUri);
 
   React.useEffect(() => {
     checkAuthentication();
@@ -156,10 +151,11 @@ export default function AppProvider( { children }: { children: React.ReactNode }
 
   async function checkAuthentication() {
     try {
+      console.log(`[AppContext] checkAuthentication: start`);
       dispatch({ type: "LOGGING_IN", loggingIn: true });
-      if (await client.isAuthenticated) {
-        const userProfile = await client.getUserDetails();
-        const token = await client.getToken();
+      if (client.isAuthenticated) {
+        const userProfile = await client.getUserProfile();
+        const token = await client.getIdToken();
         // if(userProfile.id) appsFlyer.setCustomerUserId(user.uid);
         console.log(`[AppContext] checkAuthentication: userProfile`, userProfile);
         dispatch({ type: "LOGGED_IN", user: userProfile, idToken: token });
@@ -180,6 +176,7 @@ export default function AppProvider( { children }: { children: React.ReactNode }
       dispatch({ type: "LOGGING_IN", loggingIn: true });
       const token = await client.login();
       if(token) {
+        console.log(`[AppContext] login successful: token`, token);
         checkAuthentication();
         // appsFlyer.logEvent('af_login', {});
       } else {
@@ -201,6 +198,7 @@ export default function AppProvider( { children }: { children: React.ReactNode }
       dispatch({ type: "LOGGING_IN", loggingIn: true });
       const token = await client.register();
       if(token) {
+        console.log(`[AppContext] register successful: token`, token);
         checkAuthentication();
         // appsFlyer.logEvent('af_register', {});
       } else {

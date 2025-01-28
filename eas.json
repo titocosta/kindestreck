@@ -7,6 +7,9 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+      "ios": {
+        "simulator": true
+      },
       "env": {
         "EXPO_PUBLIC_KINDE_ISSUER_URL": "https://streckenheld.kinde.com",
         "EXPO_PUBLIC_KINDE_POST_CALLBACK_URL": "streckenheld://localhost:3000/kinde_callback",
