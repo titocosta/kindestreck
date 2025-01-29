@@ -135,12 +135,14 @@ export default function AppProvider( { children }: { children: React.ReactNode }
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const client = useKindeAuth();
 
+  /*
   const redirectUri = makeRedirectUri({ native: Constants.isDevice });
   if(!process.env.EXPO_PUBLIC_KINDE_ISSUER_URL) {
     throw new Error('Missing EXPO_PUBLIC_KINDE_ISSUER_URL');
   }
   const discovery = useAutoDiscovery(process.env.EXPO_PUBLIC_KINDE_ISSUER_URL);
-  // console.debug(`[AppContext] AppProvider: discovery`, discovery, redirectUri);
+  console.debug(`[AppContext] AppProvider: discovery`, discovery, redirectUri);
+  */
 
   React.useEffect(() => {
     checkAuthentication();

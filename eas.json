@@ -14,7 +14,7 @@
         "EXPO_PUBLIC_KINDE_ISSUER_URL": "https://streckenheld.kinde.com",
         "EXPO_PUBLIC_KINDE_POST_CALLBACK_URL": "streckenheld://localhost:3000/kinde_callback",
         "EXPO_PUBLIC_KINDE_POST_LOGOUT_REDIRECT_URL": "streckenheld://localhost:3000/kinde_callback",
-        "EXPO_PUBLIC_KINDE_CLIENT_ID": "facb87bcd98245188de59ab734e3679c"
+        "EXPO_PUBLIC_KINDE_CLIENT_ID": "41d28f9be242412985ce6ff0e71e8546"
       }
     },
     "preview": {
@@ -23,7 +23,7 @@
         "EXPO_PUBLIC_KINDE_ISSUER_URL": "https://streckenheld.kinde.com",
         "EXPO_PUBLIC_KINDE_POST_CALLBACK_URL": "streckenheld://localhost:3000/kinde_callback",
         "EXPO_PUBLIC_KINDE_POST_LOGOUT_REDIRECT_URL": "streckenheld://localhost:3000/kinde_callback",
-        "EXPO_PUBLIC_KINDE_CLIENT_ID": "facb87bcd98245188de59ab734e3679c"
+        "EXPO_PUBLIC_KINDE_CLIENT_ID": "41d28f9be242412985ce6ff0e71e8546"
       }
     },
     "production": {
@@ -32,7 +32,7 @@
         "EXPO_PUBLIC_KINDE_ISSUER_URL": "https://streckenheld.kinde.com",
         "EXPO_PUBLIC_KINDE_POST_CALLBACK_URL": "streckenheld://partner.streckenheld.com/kinde_callback",
         "EXPO_PUBLIC_KINDE_POST_LOGOUT_REDIRECT_URL": "streckenheld://partner.streckenheld.com/kinde_callback",
-        "EXPO_PUBLIC_KINDE_CLIENT_ID": "facb87bcd98245188de59ab734e3679c"
+        "EXPO_PUBLIC_KINDE_CLIENT_ID": "41d28f9be242412985ce6ff0e71e8546"
       }
     }
   },
