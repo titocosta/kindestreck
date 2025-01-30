@@ -6,9 +6,11 @@ import { ThemedView } from '@/components/ThemedView';
 import { useAppContext } from '@/utils/AppContext';
 import { ThemedProgressCircle } from '@/components/ThemedProgressCircle';
 import { ThemedButton } from '@/components/ThemedButton';
+import { useTranslation } from "react-i18next";
 
 export default function Login() {
   const { login, register, user, isLoggingIn } = useAppContext();
+  const { t } = useTranslation();
 
   let btns = <>
     <ThemedButton
@@ -27,13 +29,13 @@ export default function Login() {
       loading={isLoggingIn} 
       textStyle={{ fontSize: 14, fontWeight: 'semibold' }}
     />
-    <ThemedText lighter style={styles.subtitle}>Login securely with your email, Apple ID or Google account.</ThemedText>
+    <ThemedText lighter style={styles.subtitle}>{t('login.subtitle_ios')}</ThemedText>
   </>;
 
   if (Platform.OS === 'android' || Platform.OS === 'web') {
     btns = <>
       <ThemedButton
-        title="Sign up"
+        title={t('login.signup')}
         onPress={register}
         iconName="person-add"
         iconSize={14}
@@ -41,14 +43,14 @@ export default function Login() {
         textStyle={{ fontSize: 14, fontWeight: 'semibold' }}
       />
       <ThemedButton
-        title="Sign in"
+        title={t('login.signin')}
         onPress={login}
         iconName="person"
         iconSize={14}
         loading={isLoggingIn} 
         textStyle={{ fontSize: 14, fontWeight: 'semibold' }}
       />
-      <ThemedText lighter style={styles.subtitle}>Login securely with your email or Google account.</ThemedText>
+      <ThemedText lighter style={styles.subtitle}>{t('login.subtitle_android')}</ThemedText>
     </>
   }
 
@@ -63,7 +65,7 @@ export default function Login() {
         }}
       />
       <ThemedText style={styles.title}>
-        All your orders in one place.{"\n"}
+        {t("login.title")}{"\n"}
       </ThemedText>
       {isLoggingIn ? <ThemedProgressCircle /> : btns}
       <ThemedText style={{ marginTop: 60 }} lighter type="small">App version {Application.nativeApplicationVersion} build {Application.nativeBuildVersion}</ThemedText>

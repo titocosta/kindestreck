@@ -4,7 +4,7 @@
     "slug": "streckenheldapp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/streckenheld-icon-1024x1024-transparent.png",
     "scheme": "streckenheld",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -12,20 +12,24 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.streckenheld.app",
       "scheme": "streckenheld",
+      "config": {
+        "appAuth": {
+          "redirectUri": "streckenheld://redirect"
+        }
+      },
       "associatedDomains": [
         "applinks:streckenheld.kinde.com"
       ]
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
       "package": "com.streckenheld.app",
       "intentFilters": [
         {
           "action": "VIEW",
-          "category": ["DEFAULT", "BROWSABLE"],
+          "category": [
+            "DEFAULT",
+            "BROWSABLE"
+          ],
           "data": [
             {
               "scheme": "streckenheld",
@@ -38,20 +42,21 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.ico"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
+          "image": "./assets/images/streckenheld-icon-1024x1024.png",
+          "imageWidth": 1024,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true

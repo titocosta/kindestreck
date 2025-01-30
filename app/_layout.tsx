@@ -5,10 +5,11 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import { Slot, usePathname, useGlobalSearchParams } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import AppContextProvider from '@/utils/AppContext';
 import { KindeAuthProvider } from '@kinde/expo';
+import i18n, { i18nInitPromise } from '@/utils/i18n';
 
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -18,17 +19,22 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const pathname = usePathname();
   const params = useGlobalSearchParams();
+  const [i18nLoaded, setI18nLoaded] = useState(false);
 
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     // LibreBaskerville: require('../assets/fonts/LibreBaskerville-Regular.ttf'),
   });
 
+  i18nInitPromise.then(() => {
+    setI18nLoaded(true);
+  });
+
   useEffect(() => {
-    if (loaded) {
+    if (loaded && i18nLoaded) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, i18nLoaded]);
 
   /*
   useEffect(() => {

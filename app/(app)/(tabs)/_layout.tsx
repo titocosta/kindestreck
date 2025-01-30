@@ -24,9 +24,11 @@ export default function TabLayout() {
     checkOnboarded();
   }, []);
 
+  console.log(`[TabLayout] isLoggingIn: ${isLoggingIn}, isCheckingOnboarded: ${isCheckingOnboarded}, onboarded: ${onboarded}, user:`, user);
   if(isLoggingIn || isCheckingOnboarded) return <View />;
   if(!onboarded) return <Redirect href="/onboarding" />;
   if(!user) return <Redirect href="/login" />;
+
 
 
   return (
@@ -53,15 +55,6 @@ export default function TabLayout() {
           title: 'Chat',
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'chatbox' : 'chatbox-outline'} color={color} />
-          ),  
-        }}
-      />
-      <Tabs.Screen
-        name="search"
-        options={{
-          title: 'Search',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'search' : 'search-outline'} color={color} />
           ),  
         }}
       />

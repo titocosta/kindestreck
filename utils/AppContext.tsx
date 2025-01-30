@@ -179,7 +179,7 @@ export default function AppProvider( { children }: { children: React.ReactNode }
       const token = await client.login();
       if(token) {
         console.log(`[AppContext] login successful: token`, token);
-        checkAuthentication();
+        // checkAuthentication();
         // appsFlyer.logEvent('af_login', {});
       } else {
         console.warn(`[AppContext] login: no token returned`);

@@ -1,0 +1,10 @@
+{
+  "welcome": "Willkommen bei Streckenheld",
+  "login": {
+    "title": "Alle deine Bestellungen an einem Ort.",
+    "signup": "Registrieren",
+    "signin": "Anmelden",
+    "subtitle_ios": "Login sicher mit deiner E-Mail, Apple ID oder Google-Account.",
+    "subtitle_android": "Login sicher mit deiner E-Mail oder Google-Account."
+  }
+}

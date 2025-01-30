@@ -1,0 +1,10 @@
+{
+  "welcome": "Benvenuto in Streckenheld",
+  "login": {
+    "title": "Tutte le tue ordinazioni in un unico posto.",
+    "signup": "Registrati",
+    "signin": "Accedi",
+    "subtitle_ios": "Accedi in modo sicuro con la tua email, Apple ID o Google account.",
+    "subtitle_android": "Accedi in modo sicuro con la tua email o Google account."
+  }
+}
