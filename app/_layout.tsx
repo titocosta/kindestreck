@@ -8,7 +8,6 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import AppContextProvider from '@/utils/AppContext';
-import { KindeAuthProvider } from '@kinde/expo';
 import i18n, { i18nInitPromise } from '@/utils/i18n';
 
 
@@ -52,18 +51,11 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <KindeAuthProvider config={{
-        domain: process.env.EXPO_PUBLIC_KINDE_ISSUER_URL,
-        clientId: process.env.EXPO_PUBLIC_KINDE_CLIENT_ID,
-        // Optional (default: "openid profile email offline")
-        // scopes: "openid profile email offline",
-      }}>
-        <AppContextProvider>
-          <SafeAreaProvider>
-            <Slot />
-          </SafeAreaProvider>
-        </AppContextProvider>
-      </KindeAuthProvider>
+      <AppContextProvider>
+        <SafeAreaProvider>
+          <Slot />
+        </SafeAreaProvider>
+      </AppContextProvider>
     </ThemeProvider>
   );
 }

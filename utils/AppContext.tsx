@@ -3,9 +3,14 @@ import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import Snackbar from 'react-native-snackbar';
-import { useKindeAuth } from "@kinde/expo";
 import Constants from "expo-constants";
-import { makeRedirectUri, useAutoDiscovery } from "expo-auth-session";
+import { makeRedirectUri, AuthRequest, exchangeCodeAsync } from "expo-auth-session";
+import { maybeCompleteAuthSession, openAuthSessionAsync } from "expo-web-browser";
+import { ExpoSecureStore, mapLoginMethodParamsForUrl, StorageKeys, getClaims, setActiveStorage, UserProfile } from '@kinde/js-utils';
+import { JWTDecoded, jwtDecoder } from "@kinde/jwt-decoder";
+import { validateToken } from "@kinde/jwt-validator";
+
+
 // import appsFlyer from 'react-native-appsflyer';
 
 /*
@@ -31,6 +36,7 @@ appsFlyer.initSdk({
 });
 */
 
+maybeCompleteAuthSession();
 
 type Action = {
   type: string;
@@ -42,6 +48,7 @@ type AppState = {
   isLoggedIn: boolean;
   user: any | null;
   idToken: string | null;
+  accessToken: string | null;
   error: any | null;
   contextDocs: Array<Record<string, any>>;
   isSubscribed: boolean;
@@ -66,6 +73,7 @@ const initialState: AppState = {
   isLoggedIn: false,
   user: null,
   idToken: null,
+  accessToken: null,
   error: null,
   contextDocs: [],
   isSubscribed: false,
@@ -117,7 +125,7 @@ function reducer(state: AppState, action: Action) {
       return { ...state, isLoggingIn: action.loggingIn };
 
     case "LOGGED_IN":
-      return { ...state, isLoggingIn: false, isLoggedIn: !!action.user, user: action.user, idToken: action.idToken };
+      return { ...state, isLoggingIn: false, isLoggedIn: !!action.user, user: action.user, idToken: action.idToken, accessToken: action.accessToken };
 
     case "SET_DARK_MODE":
       localSave('darkMode', action.darkMode);
@@ -133,16 +141,15 @@ export const AppContext = React.createContext(initialState);
 
 export default function AppProvider( { children }: { children: React.ReactNode }) {
   const [state, dispatch] = React.useReducer(reducer, initialState);
-  const client = useKindeAuth();
+  const [code, setCode] = React.useState("");
 
-  /*
-  const redirectUri = makeRedirectUri({ native: Constants.isDevice });
-  if(!process.env.EXPO_PUBLIC_KINDE_ISSUER_URL) {
-    throw new Error('Missing EXPO_PUBLIC_KINDE_ISSUER_URL');
-  }
-  const discovery = useAutoDiscovery(process.env.EXPO_PUBLIC_KINDE_ISSUER_URL);
-  console.debug(`[AppContext] AppProvider: discovery`, discovery, redirectUri);
-  */
+  const redirectUri = makeRedirectUri({
+    native: Constants.isDevice,
+    path: "/login",
+  });
+
+  const store: ExpoSecureStore = new ExpoSecureStore();
+  setActiveStorage(store);
 
   React.useEffect(() => {
     checkAuthentication();
@@ -151,23 +158,154 @@ export default function AppProvider( { children }: { children: React.ReactNode }
     });
   }, []);
 
+  /**
+   *
+   * @param tokenType Type of token to decode
+   * @returns { Promise<JWTDecoded | null> }
+   */
+  async function getDecodedToken<
+    T = JWTDecoded & {
+      permissions: string[];
+      org_code: string;
+    },
+  >(tokenType: "accessToken" | "idToken" = "accessToken"): Promise<T | null> {
+    const token =
+      tokenType === "accessToken" ? await getAccessToken() : await getIdToken();
+    if (!token) {
+      return null;
+    }
+    return jwtDecoder<T>(token);
+  }
+
+
+  async function authenticate(options = {}) {
+    const request = new AuthRequest({
+      clientId: process.env.EXPO_PUBLIC_KINDE_CLIENT_ID!,
+      redirectUri,
+      scopes: ['openid','profile','email','offline'],
+      responseType: "code",
+      extraParams: {
+        has_success_page: "true",
+        ...mapLoginMethodParamsForUrl(options)
+      },
+    });
+
+    try {
+      const codeResponse = await request.promptAsync(
+        {
+          authorizationEndpoint: `${process.env.EXPO_PUBLIC_KINDE_ISSUER_URL}/oauth2/auth`,
+        },
+        {
+          showInRecents: true,
+        },
+      );
+  
+      if (request && codeResponse?.type === "success") {
+        const exchangeCodeResponse = await exchangeCodeAsync(
+          {
+            clientId: process.env.EXPO_PUBLIC_KINDE_CLIENT_ID!,
+            code: codeResponse.params.code,
+            extraParams: request.codeVerifier
+              ? { code_verifier: request.codeVerifier }
+              : undefined,
+            redirectUri,
+          },
+          {
+            tokenEndpoint: `${process.env.EXPO_PUBLIC_KINDE_ISSUER_URL}/oauth2/token`,
+          },
+        );
+
+        if(exchangeCodeResponse.idToken) {
+          await store.setSessionItem(StorageKeys.idToken, exchangeCodeResponse.idToken);
+          const idTokenValidationResult = await validateToken({
+            token: exchangeCodeResponse.idToken,
+            domain: process.env.EXPO_PUBLIC_KINDE_ISSUER_URL!,
+          });
+          if (idTokenValidationResult.valid) {
+            console.debug(`[AppContext] authenticate: idTokenValidationResult is valid`, idTokenValidationResult);
+            // await store.setSessionItem(StorageKeys.idToken, exchangeCodeResponse.idToken);
+          } else {
+            console.error(`Invalid id token`, idTokenValidationResult.message);
+          }
+        }
+
+        if(exchangeCodeResponse.accessToken) {
+          await store.setSessionItem(StorageKeys.accessToken, exchangeCodeResponse.accessToken);
+          const accessTokenValidationResult = await validateToken({
+            token: exchangeCodeResponse.accessToken,
+            domain: process.env.EXPO_PUBLIC_KINDE_ISSUER_URL!,
+          });
+          if (accessTokenValidationResult.valid) {
+            console.debug(`[AppContext] authenticate: accessTokenValidationResult is valid`, accessTokenValidationResult);
+            // await store.setSessionItem(StorageKeys.accessToken, exchangeCodeResponse.accessToken);
+          } else {
+            console.error(`Invalid access token`, accessTokenValidationResult.message);
+          }
+        }
+
+        // console.log(await getClaims());
+
+        return {
+          success: true,
+          accessToken: exchangeCodeResponse.accessToken,
+          idToken: exchangeCodeResponse.idToken!,
+        };
+      } else {
+        return { success: false, errorMessage: "No code response" };
+      }
+    } catch (err: any) {
+      console.error(err);
+      return { success: false, errorMessage: err.message };
+    }
+  };
+
+  async function getAccessToken(): Promise<string | null> {
+    const token = await store.getSessionItem(StorageKeys.accessToken);
+    return typeof token === 'string' ? token : null;
+  }
+
+  async function getIdToken(): Promise<string | null> {
+    const token = await store.getSessionItem(StorageKeys.idToken);
+    return typeof token === 'string' ? token : null;
+  }
+
+  async function getUserProfile(): Promise<UserProfile | null> {
+    const idToken = await getDecodedToken<{
+      sub: string;
+      given_name: string;
+      family_name: string;
+      email: string;
+      picture: string;
+    }>("idToken");
+    if (!idToken) {
+      return null;
+    }
+    return {
+      id: idToken.sub,
+      givenName: idToken.given_name,
+      familyName: idToken.family_name,
+      email: idToken.email,
+      picture: idToken.picture,
+    };
+  }
+
   async function checkAuthentication() {
     try {
       console.log(`[AppContext] checkAuthentication: start`);
       dispatch({ type: "LOGGING_IN", loggingIn: true });
-      if (client.isAuthenticated) {
-        const userProfile = await client.getUserProfile();
-        const token = await client.getIdToken();
-        // if(userProfile.id) appsFlyer.setCustomerUserId(user.uid);
-        console.log(`[AppContext] checkAuthentication: userProfile`, userProfile);
-        dispatch({ type: "LOGGED_IN", user: userProfile, idToken: token });
+      const accessToken = await getAccessToken();
+      const idToken = await getIdToken();
+      if(accessToken) {
+        console.log(`[AppContext] checkAuthentication: accessToken found`);
+        const userProfile = await getUserProfile();
+        dispatch({ type: "LOGGED_IN", user: userProfile, idToken: idToken, accessToken: accessToken });
       } else {
-        console.log(`[AppContext] checkAuthentication: user is not authenticated`);
-        dispatch({ type: "LOGGED_IN", user: null, idToken: null });
+        console.log(`[AppContext] checkAuthentication: no accessToken found`);
+        dispatch({ type: "LOGGED_IN", user: null, idToken: null, accessToken: null });
       }
     } catch(error) {
       console.warn(`[AppContext] checkAuthentication exception`, error);
-      dispatch({ type: "LOGGED_IN", user: null, idToken: null });
+      dispatch({ type: "LOGGED_IN", user: null, idToken: null, accessToken: null });
     } finally {
       dispatch({ type: "LOGGING_IN", loggingIn: false });
     }
@@ -176,10 +314,10 @@ export default function AppProvider( { children }: { children: React.ReactNode }
   async function login() {
     try {
       dispatch({ type: "LOGGING_IN", loggingIn: true });
-      const token = await client.login();
+      const token = await authenticate({ prompt: "login" });
       if(token) {
-        console.log(`[AppContext] login successful: token`, token);
-        // checkAuthentication();
+        console.log(`[AppContext] login successful`);
+        checkAuthentication();
         // appsFlyer.logEvent('af_login', {});
       } else {
         console.warn(`[AppContext] login: no token returned`);
@@ -198,7 +336,7 @@ export default function AppProvider( { children }: { children: React.ReactNode }
   async function register() {
     try {
       dispatch({ type: "LOGGING_IN", loggingIn: true });
-      const token = await client.register();
+      const token = await authenticate({ prompt: "signup" });
       if(token) {
         console.log(`[AppContext] register successful: token`, token);
         checkAuthentication();
@@ -220,15 +358,12 @@ export default function AppProvider( { children }: { children: React.ReactNode }
   async function logout() {
     console.log(`[AppContext] logout: start`);
     try {
-      dispatch({ type: "LOGGING_IN", loggingIn: true });
-      const loggedOut = await client.logout();
-      if (loggedOut) {
-        // User was logged out
-        console.debug(`[AppContext] logout: signOut success`);
-        checkAuthentication();
-      } else {
-        console.warn(`[AppContext] logout: signOut failed`);
-      }
+      dispatch({ type: "LOGGED_IN", user: null, idToken: null, accessToken: null });
+      await openAuthSessionAsync(`${process.env.EXPO_PUBLIC_KINDE_ISSUER_URL}/logout?redirect=${redirectUri}`);
+      await store.setSessionItem(StorageKeys.accessToken, null);
+      await store.setSessionItem(StorageKeys.idToken, null);
+
+      console.debug(`[AppContext] logout: signOut success`);
     } catch (error) {
       console.warn(`[AppContext] logout: signOut exception`, error);
     } finally {

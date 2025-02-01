@@ -21,6 +21,7 @@ export default function ListItemLink({title, subtitle, onPress, href, style, sec
   const { darkMode } = useAppContext();
   const borderColor = useThemeColor({darkMode}, 'border');
   const color = secondary ? useThemeColor({darkMode}, 'secondary') : useThemeColor({darkMode}, 'text');
+  console.debug(`[ListItemLink] darkMode: ${darkMode}, secondary: ${secondary}, color: ${color}, borderColor: ${borderColor}, style:`, style);
   const children = (
     <TouchableOpacity style={[style]} onPress={onPress}>
       <ThemedView style={[styles.item, { borderColor }]}>
@@ -47,6 +48,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 15,
+    paddingHorizontal: 10,
     borderBottomWidth: 1,
     borderTopWidth: 1,
     marginTop: -1,

@@ -23,6 +23,8 @@ export function ThemedText({
   const { darkMode } = useAppContext();
   const color = useThemeColor({ light: lightColor, dark: darkColor, darkMode }, lighter ? 'lighterText' : 'text', negative);
 
+  console.debug(`[ThemedText] darkMode: ${darkMode}, lighter: ${lighter}, negative: ${negative}, color: ${color}, style:`, style);
+
   return (
     <Text
       style={[

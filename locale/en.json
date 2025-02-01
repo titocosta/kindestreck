@@ -6,5 +6,11 @@
     "signin": "Sign in",
     "subtitle_ios": "Login securely with your email, Apple ID or Google account.",
     "subtitle_android": "Login securely with your email or Google account."
+  },
+  "account": {
+    "title": "Hello, {{displayName}}!",
+    "logout": "Logout",
+    "delete": "Delete account",
+    "contact": "Contact us at support@streckenheld.com"
   }
 }

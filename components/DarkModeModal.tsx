@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import ListItemLink from "./ListItemLink";
 import { ThemedView } from "./ThemedView";
 import { ThemedText } from "./ThemedText";
